@@ -7,7 +7,8 @@ export default class Repos extends Component {
     state = {
         repos:[],
         pageNumber:1,
-        scrolling:false
+        scrolling:false,
+        incomplete_results:false
     }
     componentDidMount() {
         this.loadRepos();
@@ -16,8 +17,9 @@ export default class Repos extends Component {
         })
     }
     handleScroll = (e) => {
-        const {scrolling} = this.state;
+        const {incomplete_results,scrolling} = this.state;
         if (scrolling) return
+        if (!incomplete_results) return
         const lastLi = document.querySelector('ul.repos > li:last-child')
         const lastLiOffset = lastLi.offsetTop + lastLi.clientHeight
         const pageOffset = window.pageYOffset + window.innerHeight
@@ -27,9 +29,9 @@ export default class Repos extends Component {
 
     loadRepos = async () => {
          const {repos, pageNumber} = this.state;
-         const url =`https://api.github.com/search/repositories?q=created:>2020-01-01&sort=stars&order=desc&page=${pageNumber}`;
+         const url =`https://api.github.com/search/repositories?q=created:>2017-10-22&sort=stars&order=desc&page=${pageNumber}`;
          const response = await axios.get(url);
-         this.setState({repos:repos.concat(response.data.items), scrolling:false});
+         this.setState({repos:repos.concat(response.data.items), scrolling:false, incomplete_results:response.data.incomplete_results});
          
     }
     loadMore = () => {
